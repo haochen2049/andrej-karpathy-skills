@@ -1,0 +1,31 @@
+name: Sync fork from upstream
+
+on:
+  schedule:
+    - cron: "17 * * * *"   # 每小时第 17 分钟运行一次
+  workflow_dispatch:       # 允许你在网页 Actions 里手动点 Run workflow
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync main from upstream
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git remote add upstream https://github.com/forrestchang/andrej-karpathy-skills.git
+          git fetch upstream
+
+          git checkout main
+          git merge --ff-only upstream/main
+          git push origin main
